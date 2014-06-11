@@ -16,6 +16,8 @@ module Jekyll
       content = ""
       projects = []
 
+      ignore_list = [".", "..", ".DS_Store", "index.markdown"]
+
       portfolio_root = context.registers[:site].config['portfolio_root']             # /portfolio
       portfolio_dir_path = context.registers[:site].config['portfolio_path']         # /Volumes/Macintosh HD/Sebastian/Sites/octopress/source/portfolio
 
@@ -24,15 +26,14 @@ module Jekyll
       if(@project_folder == "")
 
         portfolio_dir.each do |project|
-          if(project != "." && project != ".." && project != ".DS_Store" && project != "index.markdown")   # Added .DS_Store and index.markdown
+          if not ignore_list.include?(project) and File.directory?("#{portfolio_dir_path}/#{project}")
             projects.push(project)
-
           end
         end
 
         projects.each do |project_name|
           Dir.foreach(portfolio_dir_path + "/" + project_name) do |screenshot|
-            if(screenshot != "." && screenshot != ".." && screenshot != ".DS_Store")
+            if not ignore_list.include?(screenshot) and File.file?("#{portfolio_dir_path}/#{project_name}/#{screenshot}")
 
               link = portfolio_root + "/" + project_name
               img = link + "/" + screenshot   #changed.
@@ -50,7 +51,7 @@ module Jekyll
       else
 
         Dir.foreach(portfolio_dir_path + "/" + @project_folder) do |screenshot|
-          if(screenshot != "." && screenshot != "..")
+          if not ignore_list.include?(screenshot) and File.file?("#{portfolio_dir_path}/#{@project_folder}/#{screenshot}")
 
             link = portfolio_root + "/" + @project_folder
             img = link + "/" + screenshot   #changed.
